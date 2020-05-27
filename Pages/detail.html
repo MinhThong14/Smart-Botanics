@@ -1,0 +1,261 @@
+<html>
+<link rel="stylesheet" type="text/css" href="css/index.css">
+<link rel="stylesheet" type="text/css" href="Bootstrap/css/bootstrap.css">
+<script src="Scripts/jquery-2.1.3.min.js"></script>
+<script src="Bootstrap/js/bootstrap.js"> </script>
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>SmartBotanics - Status</title>
+
+</head>
+
+<body>
+
+	<!-- navigation bar -->
+	<nav class="navbar navbar-default">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="#">SmartBotanics</a>
+		</div>
+      	<ul class="nav navbar-nav">
+        	<li><a href="status.html">Status </a></li>
+        	<li class="active"><a href="#">Detail</a></li>
+   	 	</ul>
+   	 	<form class="navbar-form navbar-left">
+        	<div class="form-group">
+          		<input type="text" id="new_plant_id" class="form-control" placeholder="Plant's ID ">
+        	</div>
+        	<button type="submit" class="btn btn-default" id="trigger_add_new_plant" onclick="add_new_plant();">Add</button>
+        </form>
+	</nav>
+	<!-- end navigation bar -->
+
+    <!-- Plant List -->
+    <div class="row center-block" id="plant_list">
+	</div>
+    <!-- End Plant List -->
+
+    <!-- Plant Config Modal -->
+    <div class="modal fade" id="ConfigModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="ConfigModal_title">Configure your lucky rosemary</h4>
+          </div>
+          <div class="modal-body">
+           	<label for="plant_name" >Name: </label>
+           	<input type="text" class="form-control" id="plant_name" placeholder="Lucky Rosemary">
+         
+           	<label for="plant_location" >Location: </label>
+            <input type="text" class="form-control" id="plant_location" placeholder="Bedroom">
+           
+           	<label for="plant_lux_threshold" >Lux Threshold: </label>
+            <input type="text" class="form-control" id="plant_lux_threshold" placeholder="400" >
+     
+           	<label for="plant_auto_light_on" >Auto Light On: </label>
+           	<input type="checkbox" id="plant_auto_light_on" value="true" checked>
+			<label>From</label> 
+           	<select id="plant_light_on_begin">
+ 					<option value=0>0 AM</option>
+ 					<option value=1>1 AM</option>
+ 					<option value=2>2 AM</option>
+ 					<option value=3>3 AM</option>
+ 					<option value=4>4 AM</option>
+ 					<option value=5>5 AM</option>
+ 					<option value=6>6 AM</option>
+ 					<option value=7>7 AM</option>
+ 					<option value=8>8 AM</option>
+ 					<option value=9>9 AM</option>
+ 					<option value=10>10 AM</option>
+ 					<option value=11>11 AM</option>
+ 					<option value=12>12 PM</option>
+ 					<option value=13>1 PM</option>
+ 					<option value=14>2 PM</option>
+ 					<option value=15>3 PM</option>
+ 					<option value=16>4 PM</option>
+ 					<option value=17>5 PM</option>
+ 					<option value=18>6 PM</option>
+ 					<option value=19>7 PM</option>
+ 					<option value=20>8 PM</option>
+ 					<option value=21>9 PM</option>
+ 					<option value=22>10 PM</option>
+ 					<option value=23>11 PM</option>
+ 					<option value=24>12 PM</option>
+			</select>
+			<label>To</label>
+			<select id="plant_light_on_end">
+ 					<option value=0>0 AM</option>
+ 					<option value=1>1 AM</option>
+ 					<option value=2>2 AM</option>
+ 					<option value=3>3 AM</option>
+ 					<option value=4>4 AM</option>
+ 					<option value=5>5 AM</option>
+ 					<option value=6>6 AM</option>
+ 					<option value=7>7 AM</option>
+ 					<option value=8>8 AM</option>
+ 					<option value=9>9 AM</option>
+ 					<option value=10>10 AM</option>
+ 					<option value=11>11 AM</option>
+ 					<option value=12>12 PM</option>
+ 					<option value=13>1 PM</option>
+ 					<option value=14>2 PM</option>
+ 					<option value=15>3 PM</option>
+ 					<option value=16>4 PM</option>
+ 					<option value=17>5 PM</option>
+ 					<option value=18>6 PM</option>
+ 					<option value=19>7 PM</option>
+ 					<option value=20>8 PM</option>
+ 					<option value=21>9 PM</option>
+ 					<option value=22>10 PM</option>
+ 					<option value=23>11 PM</option>
+ 					<option value=24>12 PM</option>
+			</select>
+			<br></br>
+			<label for="plant_min_moisture" >Minimum Moisture: </label>
+            <input type="text" class="form-control" id="plant_min_moisture" placeholder="30" >
+            <label for="plant_max_moisture" >Maximum Moisture: </label>
+            <input type="text" class="form-control" id="plant_max_moisture" placeholder="80" >
+            <label for="plant_auto_water_on" >Auto Water On: </label>
+            <input type="checkbox" id="plant_auto_water_on" value="true" checked>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="save_config" onclick="save_plant_config();">Save changes</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</body>
+</html>
+<script src="Highcharts-4.0.4/js/highcharts.js"></script>
+<script src="Scripts/circle-progress.js"></script>
+<script src="Scripts/smart_botanics.js"></script>
+<script>
+	var plant_list= [];
+	var update_frequency=10000; //the update_frequency is 10 second
+	var user="minhmai";
+	var plant_on_config=null;//stores the id of a plant that is being configured
+	//load the list of available plants associated with the user
+	$.ajax({
+		type:"POST",
+		url:"../network/server_return_available_plants.php",
+		data:{username:user},
+		dataType:'json'
+	}).done(function(data){
+		for (var i=0; i<data.length; i++){
+			var a_plant=new plant(data[i]);
+			a_plant.create_detail_display();
+			plant_list[data[i].id]=a_plant;
+			
+		}
+	});
+	
+	//Update the status of the plants frequently
+	setInterval(update_plants,update_frequency);
+	
+	// function update_plants()
+	function update_plants()
+	{
+		for (var i in plant_list)
+			{
+				$.ajax({
+					type:"POST",
+					url:"../network/server_update_plant_properties.php",
+					data:{id:i},
+					dataType:'json'
+				}).done(function(data){
+					if (data !=null)
+					{
+						plant_list[data.id].light_chart.series[0].addPoint([(new Date()).getTime(),parseFloat(data.light_lux)],true,true);
+						plant_list[data.id].moisture_chart.series[0].addPoint([(new Date()).getTime(),parseFloat(data.moisture)],true,true);
+					}
+				});
+			}
+	}
+	
+	// function trigger_plant_config()
+	function trigger_plant_config(id,name)
+	{
+		name=unescape(name);// unescape the string
+		$("#ConfigModal_title").html("Configure your "+name);
+		plant_on_config=id;
+		$("#plant_name").val(plant_list[id].name);
+		$("#plant_location").val(plant_list[id].location);
+		$("#plant_lux_threshold").val(plant_list[id].lux_threshold);
+		$("#plant_auto_light_on").val(plant_list[id].autoLight);
+		$("#plant_light_on_begin").val(plant_list[id].light_on_begin);
+		$("#plant_light_on_end").val(plant_list[id].light_on_end);
+		$("#plant_min_moisture").val(plant_list[id].minMoisture);
+		$("#plant_max_moisture").val(plant_list[id].maxMoisture);
+		$("#plant_auto_water_on").val(plant_list[id].autoWater);
+		$("#ConfigModal").modal("show");
+	}
+	//function save_config, save a new config for a plant
+	function save_plant_config()
+	{
+		var plant_data={
+							id:plant_on_config,
+							name:$("#plant_name").val(),
+							location: $("#plant_location").val(),
+							lux_threshold: $("#plant_lux_threshold").val(),
+							autoLight: $("#plant_auto_light_on").val(),
+							light_on_begin: $("#plant_light_on_begin").val(),
+							light_on_end: $("#plant_light_on_end").val(),
+							minMoisture: $("#plant_min_moisture").val(),
+							maxMoisture: $("#plant_max_moisture").val(),
+							autoWater: $("#plant_auto_water_on").val()
+						};
+		if (plant_on_config !=null)
+		{
+			plant_list[plant_on_config].update_name_location($("#plant_name").val(),$("#plant_location").val());
+			$.ajax({
+				type:"POST",
+				url:"../network/server_save_plant_config.php",
+				data:plant_data
+			}).done(function(response){
+				if (response==1){
+					 alert("The plant configuration was updated.");
+					 $('#ConfigModal').modal('hide');
+				}
+				else{
+					alert("Error. Try again.");
+				}
+			});
+		}
+		plant_list[plant_on_config].name= $("#plant_name").val();
+		plant_list[plant_on_config].location=$("#plant_location").val();
+		plant_list[plant_on_config].lux_threshold=$("#plant_lux_threshold").val();
+		plant_list[plant_on_config].autoLight=$("#plant_auto_light_on").val();
+		plant_list[plant_on_config].light_on_begin=$("#plant_light_on_begin").val();
+		plant_list[plant_on_config].light_on_end=$("#plant_light_on_end").val();
+		plant_list[plant_on_config].minMoisture=$("#plant_min_moisture").val();
+		plant_list[plant_on_config].maxMoisture=$("#plant_max_moisture").val();
+		plant_list[plant_on_config].autoWater= $("#plant_auto_water_on").val();
+	}
+	//function add new plant
+	function add_new_plant()
+	{
+		var id =parseInt($("#new_plant_id").val());
+		if ( id !=null){
+			$.ajax({
+				type:"POST",
+				url:"../network/server_add_new_plant.php",
+				data:{id:id,username:user},
+				dataType:'json'
+			}).done(function(new_plant){
+				if (new_plant != null){
+					var new_plant=new plant(new_plant);
+					plant_list[plant.id]=new_plant;
+					trigger_plant_config(new_plant.id,new_plant.name);
+				}
+				else
+				{
+					alert("Error. Cannot add the plant. Please try again.");
+				}
+			});
+		}
+	}
+	
+</script>
