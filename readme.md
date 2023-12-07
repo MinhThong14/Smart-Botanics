@@ -1,4 +1,4 @@
-# SmartBotanics 
+# Smart Botanics 
 ## Description
 an automatic system that allows users to take care of their plants remotely and conveniently over the Internet
 ## Component
